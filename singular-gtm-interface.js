@@ -1,4 +1,4 @@
-// This the singular GTM interface. v1.0.13
+// This the singular GTM interface. v1.1.0
 
 (function singularGtmMain() {
     if (!window.singularSdkQueue) {
@@ -74,6 +74,10 @@
                 sendDeviceCustomUserId(data);
                 break;
             }
+            case "getSingularDeviceId": {
+                getSingularDeviceId();
+                break;
+            }
             case "getMatchID": {
                 getMatchID();
                 break;
@@ -102,6 +106,26 @@
                 clearGlobalProperties();
                 break;
             }
+            case "showBanner": {
+                showBanner(data);
+                break;
+            }
+            case "hideBanner": {
+                hideBanner();
+                break;
+            }
+            case "openApp": {
+                openApp(data);
+                break;
+            }
+            case "buildWebToAppLink": {
+                buildWebToAppLink(data);
+                break;
+            }
+            case "enrichUrlWithMarketingData": {
+                enrichUrlWithMarketingData(data);
+                break;
+            }
             default: {
                 break;
             }
@@ -120,6 +144,10 @@
             config.withCustomUserId(data.customUserId);
         }
 
+        if (data.productName) {
+            config.withProductName(data.productName);
+        }
+
         if (data.sessionTimeout) {
             config.withSessionTimeoutInMinutes(data.sessionTimeout);
         }
@@ -132,9 +160,17 @@
             }
         }
 
-        // Support for global properties on initialization
-        if (data.globalProperties && typeof data.globalProperties === 'object') {
+        if (data.globalProperties) {
             config.withGlobalProperties(data.globalProperties, data.overrideExistingGlobalProperties);
+        }
+
+        if (data.enableBanners) {
+            if (data.enableWebToApp) {
+                const bannersOptions = new window.BannersOptions().withWebToAppSupport();
+                config.withBannersSupport(bannersOptions);
+            } else {
+                config.withBannersSupport();
+            }
         }
 
         window.singularSdk.init(config);
@@ -181,11 +217,11 @@
     }
 
     function sendDeviceCustomUserId(data) {
-        if (!data.customUserId) {
-            return;
-        }
-
         window.singularSdk.setDeviceCustomUserId(data.customUserId);
+    }
+
+    function getSingularDeviceId() {
+        return window.singularSdk.getSingularDeviceId();
     }
 
     function getMatchID() {
@@ -193,9 +229,6 @@
     }
 
     function setMatchID(data) {
-        if (!data.matchId) {
-            return;
-        }
         window.singularSdk.setMatchID(data.matchId);
     }
 
@@ -212,11 +245,54 @@
     }
 
     function unsetGlobalProperty(data) {
-        window.singularSdk.unsetGlobalProperty(data.propertyKey);
+        window.singularSdk.unsetGlobalProperty(data.key);
     }
 
     function clearGlobalProperties() {
         return window.singularSdk.clearGlobalProperties();
+    }
+
+    function buildLinkParams(data) {
+        const linkParams = new window.LinkParams();
+
+        if (data.androidRedirect) linkParams.withAndroidRedirect(data.androidRedirect);
+        if (data.androidDeeplink) linkParams.withAndroidDL(data.androidDeeplink);
+        if (data.androidDeferredDeeplink) linkParams.withAndroidDDL(data.androidDeferredDeeplink);
+        if (data.iosRedirect) linkParams.withIosRedirect(data.iosRedirect);
+        if (data.iosDeeplink) linkParams.withIosDL(data.iosDeeplink);
+        if (data.iosDeferredDeeplink) linkParams.withIosDDL(data.iosDeferredDeeplink);
+
+        return linkParams;
+    }
+
+    function showBanner(data) {
+        window.singularSdk.showBanner(buildLinkParams(data));
+    }
+
+    function hideBanner() {
+        window.singularSdk.hideBanner();
+    }
+
+    function openApp(data) {
+        window.singularSdk.openApp(
+            data.baseLink,
+            data.androidDeeplink || data.iosDeeplink || null,
+            null,
+            data.androidDeferredDeeplink || data.iosDeferredDeeplink || null
+        );
+    }
+
+    function buildWebToAppLink(data) {
+        return window.singularSdk.buildWebToAppLink(
+            data.baseLink,
+            data.androidDeeplink || data.iosDeeplink || null,
+            null,
+            data.androidDeferredDeeplink || data.iosDeferredDeeplink || null
+        );
+    }
+
+    function enrichUrlWithMarketingData(data) {
+        return window.singularSdk.enrichUrlWithMarketingData(data.urlToEnrich);
     }
 
     function initSingularSdkScript(queue) {
