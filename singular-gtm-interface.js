@@ -160,17 +160,19 @@
             }
         }
 
+        if (data.eventsDedupEnabled) {
+            config.withEventsDedupEnabled();
+            if (data.timeBetweenEvents) {
+                config.withTimeBetweenEvents(data.timeBetweenEvents);
+            }
+        }
+
         if (data.globalProperties) {
             config.withGlobalProperties(data.globalProperties, data.overrideExistingGlobalProperties);
         }
 
         if (data.enableBanners) {
-            if (data.enableWebToApp) {
-                const bannersOptions = new window.BannersOptions().withWebToAppSupport();
-                config.withBannersSupport(bannersOptions);
-            } else {
-                config.withBannersSupport();
-            }
+            config.withBannersSupport(data.enableWebToApp ? new window.BannersOptions().withWebToAppSupport() : undefined);
         }
 
         window.singularSdk.init(config);
@@ -255,14 +257,13 @@
     function buildLinkParams(data) {
         const linkParams = new window.LinkParams();
 
-        if (data.androidRedirect) linkParams.withAndroidRedirect(data.androidRedirect);
-        if (data.androidDeeplink) linkParams.withAndroidDL(data.androidDeeplink);
-        if (data.androidDeferredDeeplink) linkParams.withAndroidDDL(data.androidDeferredDeeplink);
-        if (data.iosRedirect) linkParams.withIosRedirect(data.iosRedirect);
-        if (data.iosDeeplink) linkParams.withIosDL(data.iosDeeplink);
-        if (data.iosDeferredDeeplink) linkParams.withIosDDL(data.iosDeferredDeeplink);
-
-        return linkParams;
+        return linkParams
+            .withAndroidRedirect(data.androidRedirect)
+            .withAndroidDL(data.androidDeeplink)
+            .withAndroidDDL(data.androidDeferredDeeplink)
+            .withIosRedirect(data.iosRedirect)
+            .withIosDL(data.iosDeeplink)
+            .withIosDDL(data.iosDeferredDeeplink);
     }
 
     function showBanner(data) {
@@ -297,7 +298,7 @@
 
     function initSingularSdkScript(queue) {
         window.isSingularSdkInitializing = true;
-        loadScript('https://cdn.jsdelivr.net/gh/matan-ezra/web-sdk-test@main/singular-sdk.js', function () {
+        loadScript('https://web-sdk-cdn.singular.net/singular-sdk/latest/singular-sdk.js', function () {
             if (!window.singularSdk) {
                 console.log("Unable to load Singular's Web SDK");
                 window.isSingularSdkInitializing = false;
