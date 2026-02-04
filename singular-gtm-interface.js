@@ -298,7 +298,7 @@
 
     function initSingularSdkScript(queue) {
         window.isSingularSdkInitializing = true;
-        loadScript('https://web-sdk-cdn.singular.net/singular-sdk/latest/singular-sdk.js', function () {
+        loadScript('https://cdn.jsdelivr.net/gh/matan-ezra/web-sdk-test@main/singular-sdk.js', function () {
             if (!window.singularSdk) {
                 console.log("Unable to load Singular's Web SDK");
                 window.isSingularSdkInitializing = false;
