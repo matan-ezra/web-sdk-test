@@ -160,7 +160,7 @@
             }
         }
 
-        if (data.eventsDedupEnabled) {
+        if (data.enableEventsDedup) {
             config.withEventsDedupEnabled();
             if (data.timeBetweenEvents) {
                 config.withTimeBetweenEvents(data.timeBetweenEvents);
