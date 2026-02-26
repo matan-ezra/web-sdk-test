@@ -167,8 +167,8 @@
             }
         }
 
-        if (data.globalProperties) {
-            config.withGlobalProperties(data.globalProperties, data.overrideExistingGlobalProperties);
+        if (data.globalProperties && data.globalProperties.length) {
+            data.globalProperties.forEach(property => config.withGlobalProperty(property.key, property.value, property.overrideExisting));
         }
 
         if (data.enableBanners) {
@@ -243,7 +243,7 @@
     }
 
     function setGlobalProperties(data) {
-        window.singularSdk.setGlobalProperties(data.key, data.value);
+        window.singularSdk.setGlobalProperties(data.key, data.value, data.overrideExisting);
     }
 
     function unsetGlobalProperty(data) {
