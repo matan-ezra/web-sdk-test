@@ -4,7 +4,7 @@
     if (!window.singularSdkQueue) {
         console.log("Singular Data Layer is null");
     } else {
-        var queue = window.singularSdkQueue;
+        const queue = window.singularSdkQueue;
 
         if (!window.singularSdk && !window.isSingularSdkInitializing) {
             initSingularSdkScript(queue);
@@ -38,7 +38,7 @@
         }
 
         // The retry mechanism is embedded in the Singular SDK, so there is no need to add it here, thus clearing the queue
-        var data = queue.shift();
+        const data = queue.shift();
         window.singularSdkQueue = queue;
 
         switch (data.trackType) {
@@ -75,11 +75,11 @@
                 break;
             }
             case "getSingularDeviceId": {
-                getSingularDeviceId();
+                getSingularDeviceId(data);
                 break;
             }
             case "getMatchID": {
-                getMatchID();
+                getMatchID(data);
                 break;
             }
             case "setMatchID": {
@@ -91,7 +91,7 @@
                 break;
             }
             case "getGlobalProperties": {
-                getGlobalProperties();
+                getGlobalProperties(data);
                 break;
             }
             case "setGlobalProperties": {
@@ -138,7 +138,7 @@
             data.productId = data.packageName;
         }
 
-        var config = new SingularConfig(data.apikey, data.secret, data.productId).withLogLevel(data.logLevel);
+        const config = new SingularConfig(data.apikey, data.secret, data.productId).withLogLevel(data.logLevel);
 
         if (data.customUserId) {
             config.withCustomUserId(data.customUserId);
@@ -222,12 +222,20 @@
         window.singularSdk.setDeviceCustomUserId(data.customUserId);
     }
 
-    function getSingularDeviceId() {
-        return window.singularSdk.getSingularDeviceId();
+    function getSingularDeviceId(data) {
+        const value = window.singularSdk.getSingularDeviceId();
+        if (data && data.dataLayerKey) {
+            _pushToDataLayer(data.dataLayerKey, value);
+        }
+        return value;
     }
 
-    function getMatchID() {
-        return window.singularSdk.getMatchID();
+    function getMatchID(data) {
+        const value = window.singularSdk.getMatchID();
+        if (data && data.dataLayerKey) {
+            _pushToDataLayer(data.dataLayerKey, value);
+        }
+        return value;
     }
 
     function setMatchID(data) {
@@ -238,8 +246,12 @@
         window.singularSdk.clearMatchID();
     }
 
-    function getGlobalProperties() {
-        return window.singularSdk.getGlobalProperties();
+    function getGlobalProperties(data) {
+        const value = window.singularSdk.getGlobalProperties();
+        if (data && data.dataLayerKey) {
+            _pushToDataLayer(data.dataLayerKey, value);
+        }
+        return value;
     }
 
     function setGlobalProperties(data) {
@@ -310,13 +322,21 @@
     }
 
     function loadScript(url, callback) {
-        var head = document.head;
-        var script = document.createElement('script');
+        const head = document.head;
+        const script = document.createElement('script');
         script.type = 'text/javascript';
         script.src = url;
         script.onload = callback;
 
         // Fire the loading
         head.appendChild(script);
+    }
+
+    function _pushToDataLayer(key, value) {
+        if (!key) return;
+        window.dataLayer = window.dataLayer || [];
+        const payload = {};
+        payload[key] = value;
+        window.dataLayer.push(payload);
     }
 })();
