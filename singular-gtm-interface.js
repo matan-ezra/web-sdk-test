@@ -296,12 +296,16 @@
     }
 
     function buildWebToAppLink(data) {
-        return window.singularSdk.buildWebToAppLink(
+        const value = window.singularSdk.buildWebToAppLink(
             data.baseLink,
             data.androidDeeplink || data.iosDeeplink || null,
             null,
             data.androidDeferredDeeplink || data.iosDeferredDeeplink || null
         );
+        if (data && data.dataLayerKey) {
+            _pushToDataLayer(data.dataLayerKey, value);
+        }
+        return value;
     }
 
     function enrichUrlWithMarketingData(data) {
