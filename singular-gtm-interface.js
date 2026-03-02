@@ -339,8 +339,10 @@
     function _pushToDataLayer(key, value) {
         if (!key) return;
         window.dataLayer = window.dataLayer || [];
-        const payload = {};
-        payload[key] = value;
-        window.dataLayer.push(payload);
+        window.dataLayer.push({
+            event: 'data_layer_updated',
+            dl_key: key,
+            [key]: value
+        });
     }
 })();
