@@ -314,7 +314,7 @@
 
     function initSingularSdkScript(queue) {
         window.isSingularSdkInitializing = true;
-        loadScript('https://web-sdk-cdn.singular.net/singular-sdk/latest/singular-sdk.js', function () {
+        loadScript('https://cdn.jsdelivr.net/gh/matan-ezra/web-sdk-test@main/singular-sdk.js', function () {
             if (!window.singularSdk) {
                 console.log("Unable to load Singular's Web SDK");
                 window.isSingularSdkInitializing = false;
@@ -340,8 +340,8 @@
         if (!key) return;
         window.dataLayer = window.dataLayer || [];
         window.dataLayer.push({
-            event: `singular.data_layer.${key}.updated`,
-            dl_key: key,
+            event: `singular.dataLayer.${key}.updated`,
+            dlKey: key,
             [key]: value
         });
     }
