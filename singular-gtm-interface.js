@@ -106,6 +106,18 @@
                 clearGlobalProperties();
                 break;
             }
+            case "limitDataSharing": {
+                limitDataSharing(data);
+                break;
+            }
+            case "getLimitDataSharing": {
+                getLimitDataSharing(data);
+                break;
+            }
+            case "clearLimitDataSharing": {
+                clearLimitDataSharing();
+                break;
+            }
             case "showBanner": {
                 showBanner(data);
                 break;
@@ -169,6 +181,10 @@
 
         if (data.globalProperties && data.globalProperties.length) {
             data.globalProperties.forEach(property => config.withGlobalProperty(property.key, property.value, property.overrideExisting));
+        }
+
+        if (typeof data.limitDataSharing === 'boolean') {
+            config.withLimitDataSharing(data.limitDataSharing);
         }
 
         if (data.enableBanners) {
@@ -255,7 +271,9 @@
     }
 
     function setGlobalProperties(data) {
-        window.singularSdk.setGlobalProperties(data.key, data.value, data.overrideExisting);
+        // Global property key used to be called key
+        const key = data.globalPropertyKey || data.key;
+        window.singularSdk.setGlobalProperties(key, data.value, data.overrideExisting);
     }
 
     function unsetGlobalProperty(data) {
@@ -264,6 +282,22 @@
 
     function clearGlobalProperties() {
         return window.singularSdk.clearGlobalProperties();
+    }
+
+    function limitDataSharing(data) {
+        window.singularSdk.limitDataSharing(data.limitDataSharing);
+    }
+
+    function getLimitDataSharing(data) {
+        const value = window.singularSdk.getLimitDataSharing();
+        if (data && data.dataLayerKey) {
+            _pushToDataLayer(data.dataLayerKey, value);
+        }
+        return value;
+    }
+
+    function clearLimitDataSharing() {
+        window.singularSdk.clearLimitDataSharing();
     }
 
     function buildLinkParams(data) {
